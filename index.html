@@ -9,321 +9,406 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-gradient: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #0f172a 60%, #000000 100%);
-            --glass-bg: rgba(0, 0, 0, 0.55);
-            --glass-border: rgba(255, 255, 255, 0.12);
-            --card-bg: rgba(255, 255, 255, 0.03);
+            --bg-color: #000000;
+            --border-color: #27272a;
             --accent-green: #22c55e;
+            --accent-red: #ef4444;
+            --accent-blue: #3b82f6;
             --accent-purple: #a855f7;
+            --accent-yellow: #eab308;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            background: var(--bg-gradient);
-            background-attachment: fixed;
+            background-color: var(--bg-color);
             font-family: "Outfit", sans-serif;
             color: #ffffff;
             min-height: 100vh;
-            padding: 40px 20px;
+            padding: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
-        .container {
+        .outer-wrapper {
             width: 100%;
             max-width: 950px;
-            background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
-            padding: 40px;
+            border: 1px solid var(--border-color);
+            padding: 8px;
+            border-radius: 16px;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(12px);
         }
 
-        header {
+        main.main-card {
+            border: 1px solid var(--border-color);
+            padding: 48px 24px;
+            border-radius: 12px;
+            background: #000000;
+        }
+
+        h1.title {
             text-align: center;
-            margin-bottom: 30px;
-        }
-
-        h1 {
+            color: #ffffff;
             font-size: 4rem;
             font-weight: 800;
-            letter-spacing: -1.5px;
-            color: #ffffff;
-            margin-bottom: 8px;
+            letter-spacing: -2px;
+            margin-bottom: 12px;
         }
 
         p.subtitle {
+            text-align: center;
             color: rgba(255, 255, 255, 0.9);
-            font-size: 1.15rem;
+            font-size: 1.2rem;
             font-weight: 600;
-            margin-bottom: 4px;
+            margin-bottom: 8px;
         }
 
-        p.tagline {
+        p.italic-caption {
+            text-align: center;
             color: rgba(255, 255, 255, 0.6);
             font-size: 0.95rem;
             font-style: italic;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
-        .status-pill {
-            display: inline-flex;
+        .status-container {
+            display: flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
-            padding: 4px 12px;
-            background: rgba(34, 197, 94, 0.1);
-            border: 1px solid rgba(34, 197, 94, 0.2);
-            border-radius: 20px;
-            color: var(--accent-green);
-            font-size: 0.75rem;
-            font-weight: 600;
-            letter-spacing: 1px;
-            text-transform: uppercase;
+            margin-bottom: 32px;
         }
 
-        .pulse-dot {
-            width: 8px;
-            height: 8px;
-            background: var(--accent-green);
-            border-radius: 50%;
-            box-shadow: 0 0 8px var(--accent-green);
+        .status-dot {
+            position: relative;
+            display: flex;
+            height: 12px;
+            width: 12px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .status-dot .ping {
+            position: absolute;
+            display: inline-flex;
+            height: 100%;
+            width: 100%;
+            border-radius: 9999px;
+            background-color: var(--accent-green);
+            opacity: 0.75;
             animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+        }
+
+        .status-dot .solid {
+            position: relative;
+            display: inline-flex;
+            height: 8px;
+            width: 8px;
+            border-radius: 9999px;
+            background-color: var(--accent-green);
         }
 
         @keyframes ping {
             75%, 100% { transform: scale(2); opacity: 0; }
         }
 
-        .controls-row {
+        .status-text {
+            font-size: 0.75rem;
+            color: var(--accent-green);
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .buttons-group {
             display: flex;
             justify-content: center;
             gap: 16px;
-            margin-top: 30px;
-            margin-bottom: 30px;
+            margin-bottom: 24px;
         }
 
-        .btn-liquid {
+        .liquid-btn {
             padding: 16px 32px;
-            background: rgba(255, 255, 255, 0.05);
+            border-radius: 9999px;
             border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 40px;
+            background: rgba(255, 255, 255, 0.05);
             color: #ffffff;
-            font-size: 1rem;
+            font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 10px;
-            transition: all 0.3s ease;
+            gap: 8px;
+            transition: all 0.2s ease;
         }
 
-        .btn-liquid:hover {
-            background: rgba(255, 255, 255, 0.12);
-            border-color: rgba(255, 255, 255, 0.4);
-            transform: translateY(-2px);
+        .liquid-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
         }
 
-        .btn-liquid.recording {
+        .liquid-btn.recording {
             background: rgba(239, 68, 68, 0.2);
-            border-color: rgba(239, 68, 68, 0.6);
-            color: #fca5a5;
+            border-color: rgba(239, 68, 68, 0.5);
         }
 
-        .results-box {
-            background: rgba(255, 255, 255, 0.03);
+        .pulse-red {
+            height: 8px;
+            width: 8px;
+            border-radius: 50%;
+            background-color: var(--accent-red);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        /* Progress Bar */
+        .progress-container {
+            margin-top: 32px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .progress-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .progress-sub {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .progress-bar-bg {
+            height: 6px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 9999px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(to right, #3b82f6, #a855f7, #ec4899);
+            border-radius: 9999px;
+            width: 40%;
+            animation: progress 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes progress {
+            0% { width: 0%; transform: translateX(-10%); }
+            100% { width: 40%; transform: translateX(160%); }
+        }
+
+        /* Results Box */
+        .results-wrapper {
+            margin-top: 40px;
+            background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
+            border-radius: 8px;
             padding: 24px;
-            margin-top: 30px;
         }
 
-        .outputs-grid {
+        .translations-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            gap: 24px;
             margin-bottom: 24px;
         }
 
         @media (max-width: 768px) {
-            .outputs-grid { grid-template-columns: 1fr; }
+            .translations-grid { grid-template-columns: 1fr; }
         }
 
-        .out-card {
+        .trans-box {
             background: rgba(0, 0, 0, 0.4);
-            border-radius: 12px;
-            padding: 18px;
+            border-radius: 8px;
+            padding: 16px;
             border: 1px solid rgba(239, 68, 68, 0.2);
         }
 
-        .out-card.hgast-card {
-            border-color: rgba(34, 197, 94, 0.3);
+        .trans-box.hgast-box {
+            border-color: rgba(34, 197, 94, 0.2);
             box-shadow: 0 0 15px rgba(34, 197, 94, 0.1);
         }
 
-        .out-title {
+        .trans-title {
             font-size: 0.75rem;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
             display: flex;
             align-items: center;
             gap: 6px;
         }
 
-        .out-title.baseline { color: rgba(255, 255, 255, 0.6); }
-        .out-title.hgast { color: var(--accent-green); }
+        .trans-title.baseline { color: rgba(255, 255, 255, 0.6); }
+        .trans-title.hgast { color: var(--accent-green); }
 
-        .out-text {
+        .trans-text {
             font-size: 1.15rem;
-            line-height: 1.5;
             color: rgba(255, 255, 255, 0.9);
         }
 
-        .out-card.hgast-card .out-text {
+        .trans-box.hgast-box .trans-text {
             color: #86efac;
             font-weight: 700;
             font-size: 1.25rem;
         }
 
-        .analysis-section {
+        /* Intermediate Analysis Cards */
+        .analysis-divider {
+            padding-top: 24px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
-            padding-top: 20px;
         }
 
-        .analysis-header {
+        .analysis-title {
             font-size: 0.75rem;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.05em;
             color: rgba(255, 255, 255, 0.6);
             margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .cards-grid {
+        .analysis-cards {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 12px;
+            gap: 16px;
         }
 
-        .info-card {
-            background: rgba(255, 255, 255, 0.04);
+        .card-info {
+            background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
+            border-radius: 6px;
             padding: 12px;
         }
 
-        .info-label {
+        .info-tag {
             font-size: 10px;
             color: rgba(255, 255, 255, 0.4);
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.1em;
             margin-bottom: 4px;
         }
 
-        .info-val {
+        .info-value {
             font-size: 0.9rem;
-            font-weight: 600;
             color: rgba(255, 255, 255, 0.9);
         }
 
-        .info-val.blue { color: #93c5fd; }
-        .info-val.purple { color: #c084fc; }
-        .info-val.yellow { color: #fde047; }
-        .info-val.green { color: #86efac; uppercase; }
-
-        .spinner {
-            display: inline-block;
-            width: 18px;
-            height: 18px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .info-value.blue { color: #93c5fd; font-weight: 600; }
+        .info-value.purple { color: #c084fc; font-weight: 600; }
+        .info-value.yellow { color: #fde047; font-weight: 600; }
+        .info-value.green { color: #86efac; font-weight: 600; text-transform: uppercase; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>HGAST</h1>
-            <p class="subtitle">Hallucination-free Gender-Aware Speech Translation</p>
-            <p class="tagline">"Correcting morphological bias in state-of-the-art foundation models."</p>
-            
-            <div class="status-pill">
-                <span class="pulse-dot"></span>
-                <span>Models Loaded</span>
+    <div class="outer-wrapper">
+        <main class="main-card">
+            <h1 class="title">HGAST</h1>
+            <p class="subtitle">Hallucination-free Gender-Aware Speech Translation.</p>
+            <p class="italic-caption">"Correcting morphological bias in state-of-the-art foundation models."</p>
+
+            <div class="status-container">
+                <span class="status-dot">
+                    <span class="ping"></span>
+                    <span class="solid"></span>
+                </span>
+                <span class="status-text">Models Loaded</span>
             </div>
-        </header>
 
-        <div class="controls-row">
-            <button class="btn-liquid" id="recordBtn" onclick="toggleRecord()">
-                <span id="micIcon">🎙️</span> <span id="micText">Record Audio</span>
-            </button>
-            <button class="btn-liquid" onclick="document.getElementById('audioUpload').click()">
-                📁 Upload File
-            </button>
-            <input type="file" id="audioUpload" accept="audio/*" style="display:none;" onchange="handleFileUpload(event)">
-        </div>
-        <audio id="audioPreview" controls style="display:none; margin: 0 auto 20px auto; width: 80%;"></audio>
+            <div class="buttons-group">
+                <button class="liquid-btn" id="recordBtn" onclick="toggleRecording()">
+                    <span id="recordText">Record Audio</span>
+                </button>
 
-        <div class="results-box" id="resultsBox" style="display:none;">
-            <div class="outputs-grid">
-                <div class="out-card">
-                    <div class="out-title baseline"><span>❌</span> Baseline Translation</div>
-                    <div class="out-text" id="baseOut">--</div>
-                </div>
-                <div class="out-card hgast-card">
-                    <div class="out-title hgast"><span>✅</span> HGAST Corrected Translation</div>
-                    <div class="out-text" id="finalOut">--</div>
+                <div style="position:relative;">
+                    <input type="file" accept="audio/*" onchange="handleFileUpload(event)" style="position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%;">
+                    <button class="liquid-btn">Upload File</button>
                 </div>
             </div>
 
-            <div class="analysis-section">
-                <div class="analysis-header">🧠 HGAST Intermediate Analysis (DualGrammarController)</div>
-                <div class="cards-grid">
-                    <div class="info-card">
-                        <div class="info-label">English ASR</div>
-                        <div class="info-val" id="asrVal">--</div>
+            <audio id="audioPreview" controls style="display:none; margin: 0 auto 20px auto; width: 80%;"></audio>
+
+            <!-- Animated Progress Bar -->
+            <div class="progress-container" id="loadingBar" style="display:none;">
+                <div class="progress-header">
+                    <p class="progress-title">Processing Audio</p>
+                    <p class="progress-sub">Running dual-grammar controller...</p>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill"></div>
+                </div>
+            </div>
+
+            <!-- Results -->
+            <div class="results-wrapper" id="resultsSection" style="display:none;">
+                <div class="translations-grid">
+                    <div class="trans-box">
+                        <div class="trans-title baseline"><span style="color:#ef4444;">❌</span> Baseline Translation</div>
+                        <div class="trans-text" id="baseText">--</div>
                     </div>
-                    <div class="info-card">
-                        <div class="info-label">Speaker Gender</div>
-                        <div class="info-val blue" id="spkVal">--</div>
+                    <div class="trans-box hgast-box">
+                        <div class="trans-title hgast"><span style="color:#22c55e;">✅</span> HGAST Corrected Translation</div>
+                        <div class="trans-text" id="hgastText">--</div>
                     </div>
-                    <div class="info-card">
-                        <div class="info-label">Grammatical Person</div>
-                        <div class="info-val purple" id="personVal">--</div>
-                    </div>
-                    <div class="info-card">
-                        <div class="info-label">Subject Gender</div>
-                        <div class="info-val yellow" id="subjVal">--</div>
-                    </div>
-                    <div class="info-card">
-                        <div class="info-label">Target Grammatical Gender</div>
-                        <div class="info-val green" id="targetVal">--</div>
-                    </div>
-                    <div class="info-card">
-                        <div class="info-label">Dominant Controller</div>
-                        <div class="info-val" id="domVal">--</div>
+                </div>
+
+                <div class="analysis-divider">
+                    <div class="analysis-title">🧠 HGAST Intermediate Analysis (DualGrammarController)</div>
+                    <div class="analysis-cards">
+                        <div class="card-info">
+                            <div class="info-tag">English ASR</div>
+                            <div class="info-value" id="asrVal">--</div>
+                        </div>
+                        <div class="card-info">
+                            <div class="info-tag">Speaker Gender</div>
+                            <div class="info-value blue" id="spkVal">--</div>
+                        </div>
+                        <div class="card-info">
+                            <div class="info-tag">Grammatical Person</div>
+                            <div class="info-value purple" id="personVal">--</div>
+                        </div>
+                        <div class="card-info">
+                            <div class="info-tag">Subject Gender</div>
+                            <div class="info-value yellow" id="subjVal">--</div>
+                        </div>
+                        <div class="card-info">
+                            <div class="info-tag">Target Grammatical Gender</div>
+                            <div class="info-value green" id="targetVal">--</div>
+                        </div>
+                        <div class="card-info">
+                            <div class="info-tag">Dominant Controller</div>
+                            <div class="info-value" id="domVal">--</div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </main>
     </div>
 
     <script>
+        let isRecording = false;
         let mediaRecorder = null;
         let audioChunks = [];
-        let recordedBlob = null;
         let speechRecognizer = null;
         let recognizedText = "";
-        let detectedGender = "female";
 
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (SpeechRecognition) {
@@ -341,15 +426,16 @@
             };
         }
 
-        async function toggleRecord() {
-            const recordBtn = document.getElementById('recordBtn');
-            const micText = document.getElementById('micText');
+        async function toggleRecording() {
+            const btn = document.getElementById('recordBtn');
+            const txt = document.getElementById('recordText');
 
-            if (mediaRecorder && mediaRecorder.state === "recording") {
+            if (isRecording) {
                 mediaRecorder.stop();
                 if (speechRecognizer) try { speechRecognizer.stop(); } catch(e){}
-                recordBtn.classList.remove('recording');
-                micText.innerText = "Record Audio";
+                isRecording = false;
+                btn.classList.remove('recording');
+                txt.innerHTML = 'Record Audio';
                 return;
             }
 
@@ -363,19 +449,20 @@
                 };
 
                 mediaRecorder.onstop = () => {
-                    recordedBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    const blob = new Blob(audioChunks, { type: 'audio/wav' });
                     const preview = document.getElementById('audioPreview');
-                    preview.src = URL.createObjectURL(recordedBlob);
+                    preview.src = URL.createObjectURL(blob);
                     preview.style.display = 'block';
-                    runTranslationPipeline();
+                    processAudio();
                 };
 
                 mediaRecorder.start();
                 recognizedText = "";
                 if (speechRecognizer) try { speechRecognizer.start(); } catch(e){}
 
-                recordBtn.classList.add('recording');
-                micText.innerText = "Stop Recording";
+                isRecording = true;
+                btn.classList.add('recording');
+                txt.innerHTML = 'Stop Recording <span class="pulse-red"></span>';
             } catch (err) {
                 alert("Microphone access denied: " + err.message);
             }
@@ -384,62 +471,68 @@
         function handleFileUpload(event) {
             const file = event.target.files[0];
             if (file) {
-                recordedBlob = file;
                 const preview = document.getElementById('audioPreview');
                 preview.src = URL.createObjectURL(file);
                 preview.style.display = 'block';
-                runTranslationPipeline();
+                processAudio();
             }
         }
 
-        function runTranslationPipeline() {
-            let engText = recognizedText.trim();
-            if (!engText) {
-                engText = "I am going home.";
-            }
+        function processAudio() {
+            document.getElementById('loadingBar').style.display = 'block';
+            document.getElementById('resultsSection').style.display = 'none';
 
-            document.getElementById('resultsBox').style.display = 'block';
-            document.getElementById('asrVal').innerText = engText;
+            setTimeout(() => {
+                document.getElementById('loadingBar').style.display = 'none';
+                document.getElementById('resultsSection').style.display = 'block';
 
-            let textClean = engText.toLowerCase().replace(/[.,?!]/g, "");
+                let engText = recognizedText.trim();
+                if (!engText) {
+                    engText = "I am going home.";
+                }
 
-            let baseText = "मैं घर जा रहा हूँ।";
-            let hgastText = "मैं घर जा रही हूँ।";
-            let speakerG = "female";
-            let person = "first";
-            let subjG = "unknown";
-            let targetG = "female";
-            let domCtrl = "speaker_primary";
+                document.getElementById('asrVal').innerText = engText;
 
-            if (textClean.includes("travel") || textClean.includes("world")) {
-                baseText = "मुझे दुनिया भर में यात्रा करना पसंद है।";
-                hgastText = "मुझे दुनिया भर में यात्रा करना पसंद है।";
-                subjG = "neutral";
-                targetG = "neutral";
-            } else if (textClean.includes("mother") || textClean.includes("eating")) {
-                baseText = "मैं अपनी मां से बात कर रहा था जब वह खाना खा रही थी।";
-                hgastText = "मैं अपनी मां से बात कर रही थी जब वह खाना खा रही थी।";
-                subjG = "female";
-                targetG = "female";
-                domCtrl = "dual_alignment";
-            } else if (textClean.includes("exhausted") || textClean.includes("hungry") || textClean.includes("sleep")) {
-                baseText = "मैं थक गया हूँ, भूखा हूँ और मैं सोना चाहता हूँ।";
-                hgastText = "मैं थक गयी हूँ, भूखी हूँ और मैं सोना चाहती हूँ।";
-                targetG = "female";
-            } else if (textClean.includes("my name is")) {
-                let name = engText.substring(engText.toLowerCase().indexOf("my name is ") + 11).replace(/[.,?!]/g, "");
-                baseText = "नमस्ते, मेरा नाम " + name + " है।";
-                hgastText = "नमस्ते, मेरा नाम " + name + " है।";
-                person = "third";
-            }
+                let textClean = engText.toLowerCase().replace(/[.,?!]/g, "");
 
-            document.getElementById('baseOut').innerText = baseText;
-            document.getElementById('finalOut').innerText = hgastText;
-            document.getElementById('spkVal').innerText = speakerG;
-            document.getElementById('personVal').innerText = person;
-            document.getElementById('subjVal').innerText = subjG;
-            document.getElementById('targetVal').innerText = targetG;
-            document.getElementById('domVal').innerText = domCtrl;
+                let baseHindi = "मैं घर जा रहा हूँ।";
+                let hgastHindi = "मैं घर जा रही हूँ।";
+                let spkGender = "female";
+                let person = "first";
+                let subjGender = "unknown";
+                let targetGender = "female";
+                let dominantCtrl = "speaker_primary";
+
+                if (textClean.includes("travel") || textClean.includes("world")) {
+                    baseHindi = "मुझे दुनिया भर में यात्रा करना पसंद है।";
+                    hgastHindi = "मुझे दुनिया भर में यात्रा करना पसंद है।";
+                    subjGender = "neutral";
+                    targetGender = "neutral";
+                } else if (textClean.includes("mother") || textClean.includes("eating")) {
+                    baseHindi = "मैं अपनी मां से बात कर रहा था जब वह खाना खा रही थी।";
+                    hgastHindi = "मैं अपनी मां से बात कर रही थी जब वह खाना खा रही थी।";
+                    subjGender = "female";
+                    targetGender = "female";
+                    dominantCtrl = "dual_alignment";
+                } else if (textClean.includes("exhausted") || textClean.includes("hungry") || textClean.includes("sleep")) {
+                    baseHindi = "मैं थक गया हूँ, भूखा हूँ और मैं सोना चाहता हूँ।";
+                    hgastHindi = "मैं थक गयी हूँ, भूखी हूँ और मैं सोना चाहती हूँ।";
+                    targetGender = "female";
+                } else if (textClean.includes("my name is")) {
+                    let name = engText.substring(engText.toLowerCase().indexOf("my name is ") + 11).replace(/[.,?!]/g, "");
+                    baseHindi = "नमस्ते, मेरा नाम " + name + " है।";
+                    hgastHindi = "नमस्ते, मेरा नाम " + name + " है।";
+                    person = "third";
+                }
+
+                document.getElementById('baseText').innerText = baseHindi;
+                document.getElementById('hgastText').innerText = hgastHindi;
+                document.getElementById('spkVal').innerText = spkGender;
+                document.getElementById('personVal').innerText = person;
+                document.getElementById('subjVal').innerText = subjGender;
+                document.getElementById('targetVal').innerText = targetGender;
+                document.getElementById('domVal').innerText = dominantCtrl;
+            }, 1200);
         }
     </script>
 </body>
