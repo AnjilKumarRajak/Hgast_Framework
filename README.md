@@ -3,16 +3,21 @@ title: HGAST Framework
 emoji: 🎙️
 colorFrom: blue
 colorTo: purple
-sdk: static
+sdk: gradio
+sdk_version: 4.44.0
+app_file: app.py
 pinned: false
+header: mini
+short_description: Hierarchical Gender Arbitration for Speech Translation
 ---
 
 # 🎙️ HGAST Framework
 
-**HGAST Framework** (Hierarchical Gender Arbitration for Speech Translation) combines acoustic speaker analysis, linguistic subject parsing, and gender arbitration to produce gender-faithful Hindi translations directly from speech and text.
+**HGAST Framework** (Hierarchical Gender Arbitration for Speech Translation) combines speaker & subject linguistic analysis, dual-controller gender routing, and morphological refinement to produce grammatically accurate gender-aligned Hindi translations.
 
-## 🚀 Key Features
+## 🚀 Dynamic Speech Translation Pipeline
 
-1. **🎤 Direct Speech & Microphone Input**: Real-time microphone recording and audio file upload.
-2. **✨ Baseline Output (SeamlessM4T-v2-Large)**: Direct translation baseline.
-3. **✨ HGAST Output (Gender-Faithful)**: Acoustic and linguistic gender-aligned translation.
+1. **🎤 Speech ASR**: Real-time Whisper ASR speech-to-text.
+2. **👤 Speaker Gender Detection**: Wav2Vec2 acoustic speaker gender recognition.
+3. **🌐 Baseline Output**: Meta SeamlessM4T-v2-Large neural translation.
+4. **🧠 HGAST Output**: Dual controller gender-faithful morphological correction.
