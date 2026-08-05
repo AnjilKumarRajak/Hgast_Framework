@@ -31,17 +31,17 @@ class HFInferenceManager:
         if not audio_filepath or not os.path.exists(audio_filepath):
             return "I am going home."
 
-        # 1. Local transformers pipeline
+        # 1. Local transformers pipeline (with chunk_length_s for long audio support)
         try:
             if "asr" not in _local_pipelines:
                 from transformers import pipeline
-                _local_pipelines["asr"] = pipeline("automatic-speech-recognition", model=DEFAULT_ASR_MODEL)
+                _local_pipelines["asr"] = pipeline("automatic-speech-recognition", model=DEFAULT_ASR_MODEL, chunk_length_s=30)
             res = _local_pipelines["asr"](audio_filepath)
             return res["text"].strip()
         except Exception as e:
             log.warning(f"Local ASR pipeline unavailable: {e}")
 
-        # 2. HTTP Inference API with 3s timeout
+        # 2. HTTP Inference API with 15s timeout
         try:
             headers = {}
             if self.api_key:
@@ -49,7 +49,7 @@ class HFInferenceManager:
             url = f"https://api-inference.huggingface.co/models/{DEFAULT_ASR_MODEL}"
             with open(audio_filepath, "rb") as f:
                 data = f.read()
-            resp = requests.post(url, headers=headers, data=data, timeout=3)
+            resp = requests.post(url, headers=headers, data=data, timeout=15)
             if resp.status_code == 200:
                 res_json = resp.json()
                 if isinstance(res_json, dict) and "text" in res_json:
