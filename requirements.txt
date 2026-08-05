@@ -1,0 +1,14 @@
+gradio>=4.44.0
+huggingface_hub>=0.20.0
+requests
+fastapi
+uvicorn[standard]
+librosa
+soundfile
+edge-tts
+spacy
+gender-guesser
+numpy
+scipy
+python-multipart
+tqdm

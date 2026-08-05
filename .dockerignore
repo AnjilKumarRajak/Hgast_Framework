@@ -1,0 +1,65 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.pytest_cache/
+.mypy_cache/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Node
+node_modules/
+.next/
+npm-debug.log*
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+
+# VS Code / IDE
+.vscode/
+.idea/
+
+# macOS / Windows
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Results / outputs
+results/
+evaluation/
+outputs/
+tmp/
+
+# Archives
+*.zip
+*.tar
+*.gz
+*.7z
+
+# Local caches (DO NOT include these in the image)
+.cache/
+hf_cache/
+torch_cache/
+
+# Python build artifacts
+build/
+dist/
+*.egg-info/
+
+# Local Docker metadata
+docker-data/

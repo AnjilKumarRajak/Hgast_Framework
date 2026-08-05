@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HGAST++ Static Space | HF Inference API (Option 3)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
+            --glass-bg: rgba(15, 23, 42, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --card-bg: rgba(30, 41, 59, 0.7);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: var(--bg-gradient); font-family: "Outfit", sans-serif; color: var(--text-primary); min-height: 100vh; padding: 20px; display: flex; justify-content: center; align-items: center; }
+        .container { width: 100%; max-width: 1100px; background: var(--glass-bg); backdrop-filter: blur(16px); border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px; }
+        header { text-align: center; margin-bottom: 30px; }
+        h1 { font-size: 2.8rem; font-weight: 800; background: linear-gradient(to right, #818cf8, #c084fc, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .card { background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 16px; padding: 20px; }
+        label { display: block; margin-bottom: 6px; color: var(--text-secondary); font-size: 0.9rem; }
+        input, textarea { width: 100%; padding: 10px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--glass-border); border-radius: 8px; color: white; margin-bottom: 12px; }
+        button { width: 100%; padding: 12px; background: var(--accent-gradient); border: none; border-radius: 10px; color: white; font-weight: 600; cursor: pointer; }
+        .output { background: rgba(15, 23, 42, 0.6); padding: 10px; border-radius: 8px; margin-bottom: 12px; min-height: 40px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>HGAST++ Option 3 (HF Inference API)</h1>
+            <p style="color: #94a3b8;">Free Static Space & Serverless Inference API Integration</p>
+        </header>
+        <div class="grid">
+            <div class="card">
+                <label>HF API Token (Optional):</label>
+                <input type="text" id="tok" placeholder="hf_...">
+                <label>English Text:</label>
+                <textarea id="txt" rows="3">I am exhausted, hungry and I just want to sleep.</textarea>
+                <button onclick="run()">Translate with HF Inference API</button>
+            </div>
+            <div class="card">
+                <label>Translation Result:</label>
+                <div class="output" id="res">--</div>
+            </div>
+        </div>
+    </div>
+    <script>
+        async function run() {
+            const txt = document.getElementById("txt").value;
+            const tok = document.getElementById("tok").value;
+            document.getElementById("res").innerText = "Calling HF Inference API...";
+            try {
+                const headers = tok ? {"Authorization": "Bearer " + tok} : {};
+                const resp = await fetch("https://api-inference.huggingface.co/models/Qwen/Qwen2.5-7B-Instruct", {
+                    method: "POST",
+                    headers: Object.assign({"Content-Type": "application/json"}, headers),
+                    body: JSON.stringify({inputs: "Translate to Hindi: " + txt})
+                });
+                const data = await resp.json();
+                document.getElementById("res").innerText = JSON.stringify(data);
+            } catch(e) {
+                document.getElementById("res").innerText = "Error: " + e;
+            }
+        }
+    </script>
+</body>
+</html>
