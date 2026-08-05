@@ -100,21 +100,30 @@ class HFInferenceManager:
         if not text or not text.strip():
             return ""
 
-        t_clean = text.strip().lower().replace(".", "").replace("?", "").replace("!", "")
-        benchmarks = {
-            "i am going home": "मैं घर जा रहा हूँ।",
-            "i love to travel the world": "मुझे दुनिया भर में यात्रा करना पसंद है।",
-            "i was talking to my mother while she was eating food": "मैं अपनी मां से बात कर रहा था जब वह खाना खा रही थी।",
-            "and i just wanted to sleep": "और मैं बस सोना चाहता था।",
-            "i am exhausted hungry and i just want to sleep": "मैं थक गया हूँ, भूखा हूँ और मैं सोना चाहता हूँ।",
-            "hi my name is anjil kumar rajak": "नमस्ते, मेरा नाम अंजिल कुमार रजक है।",
-            "hello my name is anjil kumar rajak": "नमस्ते, मेरा नाम अंजिल कुमार रजक है।",
-            "you are eating": "तुम खा रहे हो।",
-            "he is going home": "वह घर जा रहा है।",
-            "she is going home": "वह घर जा रही है।"
-        }
-        if t_clean in benchmarks:
-            return benchmarks[t_clean]
+        # 1. Real lightweight local translation (Helsinki-NLP is fast and fits in memory)
+        try:
+            if "translation" not in _local_pipelines:
+                from transformers import pipeline
+                _local_pipelines["translation"] = pipeline("translation", model="Helsinki-NLP/opus-mt-en-hi")
+            res = _local_pipelines["translation"](text)
+            return res[0]["translation_text"].strip()
+        except Exception as e:
+            log.warning(f"Local translation pipeline unavailable: {e}")
+
+        # 2. HTTP Inference API fallback
+        try:
+            headers = {}
+            if self.api_key:
+                headers["Authorization"] = f"Bearer {self.api_key}"
+            url = "https://api-inference.huggingface.co/models/Helsinki-NLP/opus-mt-en-hi"
+            payload = {"inputs": text}
+            resp = requests.post(url, headers=headers, json=payload, timeout=15)
+            if resp.status_code == 200:
+                res_json = resp.json()
+                if isinstance(res_json, list) and "translation_text" in res_json[0]:
+                    return res_json[0]["translation_text"].strip()
+        except Exception as e:
+            log.warning(f"HTTP Translation API failed: {e}")
 
         return f"मैं {text.strip()} कर रहा हूँ।"
 
