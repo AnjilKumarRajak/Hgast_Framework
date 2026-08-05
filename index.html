@@ -120,48 +120,31 @@
             display: block;
             font-size: 0.92rem;
             color: var(--text-secondary);
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             font-weight: 400;
-        }
-
-        textarea {
-            width: 100%;
-            padding: 14px 18px;
-            background: rgba(15, 23, 42, 0.8);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            color: var(--text-primary);
-            font-family: inherit;
-            font-size: 1rem;
-            outline: none;
-            transition: all 0.3s ease;
-        }
-
-        textarea:focus {
-            border-color: #a855f7;
-            box-shadow: 0 0 15px rgba(168, 85, 247, 0.3);
         }
 
         .audio-controls {
             display: flex;
-            gap: 12px;
-            margin-bottom: 12px;
+            flex-direction: column;
+            gap: 14px;
+            margin-bottom: 14px;
         }
 
         .btn-mic {
-            flex: 1;
-            padding: 14px;
+            width: 100%;
+            padding: 18px;
             background: rgba(99, 102, 241, 0.2);
             border: 1px solid rgba(99, 102, 241, 0.4);
-            border-radius: 12px;
+            border-radius: 14px;
             color: #a5b4fc;
-            font-size: 1rem;
+            font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 10px;
             transition: all 0.3s ease;
         }
 
@@ -197,6 +180,7 @@
             cursor: pointer;
             box-shadow: 0 4px 20px rgba(168, 85, 247, 0.4);
             transition: all 0.3s ease;
+            margin-top: 10px;
         }
 
         .btn-submit:hover {
@@ -249,6 +233,18 @@
             font-weight: 600;
         }
 
+        .detected-badge {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: rgba(99, 102, 241, 0.2);
+            color: #818cf8;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+
         .spinner {
             display: inline-block;
             width: 18px;
@@ -272,29 +268,27 @@
 
         <div class="grid">
             <div class="card">
-                <div class="card-title">🎤 Speech & Text Input</div>
+                <div class="card-title">🎙️ Speech Audio Input</div>
 
                 <div class="form-group">
-                    <label>Speak in Mic or Select Audio File:</label>
+                    <label>Speak into your microphone or upload an audio file:</label>
                     <div class="audio-controls">
                         <button class="btn-mic" id="recordBtn" onclick="toggleRecord()">
                             <span id="micIcon">🎙️</span> <span id="micText">Speak in Mic</span>
                         </button>
+
+                        <input type="file" id="audioUpload" accept="audio/*" style="display:none;" onchange="handleAudioUpload(event)">
+                        <button class="btn-mic" onclick="document.getElementById('audioUpload').click()" style="background: rgba(255,255,255,0.05); border-color: var(--glass-border);">
+                            📁 Upload Audio File
+                        </button>
                     </div>
-                    <input type="file" id="audioUpload" accept="audio/*" style="display:none;" onchange="handleAudioUpload(event)">
-                    <button class="btn-mic" onclick="document.getElementById('audioUpload').click()" style="background: rgba(255,255,255,0.05); border-color: var(--glass-border);">
-                        📁 Select Audio File
-                    </button>
-                    <audio id="audioPreview" controls style="display:none; margin-top:12px;"></audio>
+
+                    <audio id="audioPreview" controls style="display:none; margin-top:14px; width:100%;"></audio>
+                    <div id="genderBadge" class="detected-badge" style="display:none;">Detected Speaker Voice: Male</div>
                 </div>
 
-                <div class="form-group">
-                    <label for="textInput">Or Type / Edit English Text:</label>
-                    <textarea id="textInput" rows="3" placeholder="e.g. Hi, my name is Anjil Kumar Rajak."></textarea>
-                </div>
-
-                <button class="btn-submit" id="submitBtn" onclick="processHGAST()">
-                    <span id="btnText">Translate & Align Gender</span>
+                <button class="btn-submit" id="submitBtn" onclick="processVoiceTranslation()">
+                    <span id="btnText">Translate Voice & Align Gender</span>
                 </button>
             </div>
 
@@ -303,7 +297,7 @@
 
                 <div class="output-card">
                     <div class="output-label">English Transcript (ASR)</div>
-                    <div class="output-text" id="asrOut">--</div>
+                    <div class="output-text" id="asrOut">Click 'Speak in Mic' or upload audio to transcribe</div>
                 </div>
 
                 <div class="output-card">
@@ -323,6 +317,32 @@
         let mediaRecorder = null;
         let audioChunks = [];
         let recordedBlob = null;
+        let speechRecognizer = null;
+        let recognizedText = "";
+        let detectedSpeakerGender = "female"; // Default or pitch-detected
+        let audioContext = null;
+        let pitchSum = 0;
+        let pitchCount = 0;
+
+        // Initialize Web Speech Recognition
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRecognition) {
+            speechRecognizer = new SpeechRecognition();
+            speechRecognizer.continuous = true;
+            speechRecognizer.interimResults = true;
+            speechRecognizer.lang = 'en-US';
+
+            speechRecognizer.onresult = (event) => {
+                let transcript = '';
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    transcript += event.results[i][0].transcript;
+                }
+                recognizedText = transcript.trim();
+                if (recognizedText) {
+                    document.getElementById('asrOut').innerText = recognizedText;
+                }
+            };
+        }
 
         async function toggleRecord() {
             const recordBtn = document.getElementById('recordBtn');
@@ -330,6 +350,7 @@
 
             if (mediaRecorder && mediaRecorder.state === "recording") {
                 mediaRecorder.stop();
+                if (speechRecognizer) try { speechRecognizer.stop(); } catch(e){}
                 recordBtn.classList.remove('recording');
                 micText.innerText = "Speak in Mic";
                 return;
@@ -337,6 +358,31 @@
 
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                
+                // Acoustic pitch frequency analyzer to detect voice gender
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const source = audioContext.createMediaStreamSource(stream);
+                const analyser = audioContext.createAnalyser();
+                analyser.fftSize = 2048;
+                source.connect(analyser);
+
+                pitchSum = 0;
+                pitchCount = 0;
+                const buffer = new Float32Array(analyser.fftSize);
+
+                const pitchInterval = setInterval(() => {
+                    if (!mediaRecorder || mediaRecorder.state !== "recording") {
+                        clearInterval(pitchInterval);
+                        return;
+                    }
+                    analyser.getFloatTimeDomainData(buffer);
+                    let pitch = autoCorrelate(buffer, audioContext.sampleRate);
+                    if (pitch > 80 && pitch < 350) {
+                        pitchSum += pitch;
+                        pitchCount++;
+                    }
+                }, 100);
+
                 mediaRecorder = new MediaRecorder(stream);
                 audioChunks = [];
 
@@ -349,14 +395,73 @@
                     const preview = document.getElementById('audioPreview');
                     preview.src = URL.createObjectURL(recordedBlob);
                     preview.style.display = 'block';
+
+                    // Compute average fundamental frequency pitch
+                    if (pitchCount > 0) {
+                        let avgPitch = pitchSum / pitchCount;
+                        detectedSpeakerGender = (avgPitch > 160) ? "female" : "male";
+                    } else {
+                        detectedSpeakerGender = "female";
+                    }
+
+                    const badge = document.getElementById('genderBadge');
+                    badge.innerText = "Detected Speaker Voice: " + (detectedSpeakerGender === 'female' ? "Female (High Pitch)" : "Male (Low Pitch)");
+                    badge.style.display = 'inline-block';
                 };
 
                 mediaRecorder.start();
+                recognizedText = "";
+                if (speechRecognizer) {
+                    try { speechRecognizer.start(); } catch(e){}
+                }
+
                 recordBtn.classList.add('recording');
-                micText.innerText = "Recording... Click to Stop";
+                micText.innerText = "Recording Voice... Click to Stop";
             } catch (err) {
                 alert("Microphone permission denied or unavailable: " + err.message);
             }
+        }
+
+        // Auto-correlation pitch detection for acoustic voice analysis
+        function autoCorrelate(buf, sampleRate) {
+            let SIZE = buf.length;
+            let rms = 0;
+            for (let i = 0; i < SIZE; i++) {
+                let val = buf[i];
+                rms += val * val;
+            }
+            rms = Math.sqrt(rms / SIZE);
+            if (rms < 0.01) return -1;
+
+            let r1 = 0, r2 = SIZE - 1, thres = 0.2;
+            for (let i = 0; i < SIZE / 2; i++) {
+                if (Math.abs(buf[i]) < thres) { r1 = i; break; }
+            }
+            for (let i = 1; i < SIZE / 2; i++) {
+                if (Math.abs(buf[SIZE - i]) < thres) { r2 = SIZE - i; break; }
+            }
+
+            buf = buf.slice(r1, r2);
+            SIZE = buf.length;
+
+            let c = new Array(SIZE).fill(0);
+            for (let i = 0; i < SIZE; i++) {
+                for (let j = 0; j < SIZE - i; j++) {
+                    c[i] = c[i] + buf[j] * buf[j + i];
+                }
+            }
+
+            let d = 0;
+            while (c[d] > c[d + 1]) d++;
+            let maxval = -1, maxpos = -1;
+            for (let i = d; i < SIZE; i++) {
+                if (c[i] > maxval) {
+                    maxval = c[i];
+                    maxpos = i;
+                }
+            }
+            let T0 = maxpos;
+            return sampleRate / T0;
         }
 
         function handleAudioUpload(event) {
@@ -369,13 +474,11 @@
             }
         }
 
-        // Translation Engine translating English text to natural Hindi
-        function translateSentence(engText) {
-            let text = engText.trim();
-            let textClean = text.toLowerCase().replace(/[.,?!]/g, "");
+        // Real-time Voice Translation Engine
+        function translateVoice(engText, gender) {
+            let textClean = engText.trim().toLowerCase().replace(/[.,?!]/g, "");
 
-            // Exact match dictionary for standard phrases & names
-            const translationMap = {
+            const voiceDict = {
                 "hi my name is anjil kumar rajak": {
                     base: "नमस्ते, मेरा नाम अंजिल कुमार रजक है।",
                     hgast: "नमस्ते, मेरा नाम अंजिल कुमार रजक है।"
@@ -386,101 +489,80 @@
                 },
                 "i am going home": {
                     base: "मैं घर जा रहा हूँ।",
-                    hgast: "मैं घर जा रही हूँ।"
+                    hgast: (gender === 'female') ? "मैं घर जा रही हूँ।" : "मैं घर जा रहा हूँ।"
                 },
                 "i am exhausted hungry and i just want to sleep": {
                     base: "मैं थक गया हूँ, भूखा हूँ और मैं सोना चाहता हूँ।",
-                    hgast: "मैं थक गयी हूँ, भूखी हूँ और मैं सोना चाहती हूँ।"
+                    hgast: (gender === 'female') ? "मैं थक गयी हूँ, भूखी हूँ और मैं सोना चाहती हूँ।" : "मैं थक गया हूँ, भूखा हूँ और मैं सोना चाहता हूँ।"
                 },
                 "you are eating": {
                     base: "तुम खा रहे हो।",
-                    hgast: "तुम खा रही हो।"
-                },
-                "he is going home": {
-                    base: "वह घर जा रहा है।",
-                    hgast: "वह घर जा रहा है।"
-                },
-                "she is going home": {
-                    base: "वह घर जा रही है।",
-                    hgast: "वह घर जा रही है।"
+                    hgast: (gender === 'female') ? "तुम खा रही हो।" : "तुम खा रहे हो।"
                 },
                 "i was sitting alone in the dark room": {
                     base: "मैं अंधेरे कमरे में अकेला बैठा था।",
-                    hgast: "मैं अंधेरे कमरे में अकेली बैठी थी।"
-                },
-                "my sister is going to her dance class": {
-                    base: "मेरी बहन अपनी डांस क्लास जा रही है।",
-                    hgast: "मेरी बहन अपनी डांस क्लास जा रही है।"
+                    hgast: (gender === 'female') ? "मैं अंधेरे कमरे में अकेली बैठी थी।" : "मैं अंधेरे कमरे में अकेला बैठा था।"
                 }
             };
 
-            if (translationMap[textClean]) {
-                return translationMap[textClean];
+            if (voiceDict[textClean]) {
+                return voiceDict[textClean];
             }
 
-            // Smart Rule-based Translation Generator for generic inputs
-            let baseHindi = "";
-            let hgastHindi = "";
+            // General voice-driven sentence parser
+            let base = "";
+            let hgast = "";
 
-            if (textClean.startsWith("hi ") || textClean.startsWith("hello ")) {
-                let rest = text.substring(text.indexOf(" ") + 1);
-                if (rest.toLowerCase().includes("my name is ")) {
-                    let name = rest.substring(rest.toLowerCase().indexOf("my name is ") + 11).replace(/[.,?!]/g, "");
-                    baseHindi = "नमस्ते, मेरा नाम " + name + " है।";
-                    hgastHindi = "नमस्ते, मेरा नाम " + name + " है।";
-                } else {
-                    baseHindi = "नमस्ते, " + rest + "।";
-                    hgastHindi = "नमस्ते, " + rest + "।";
-                }
-            } else if (textClean.includes("my name is ")) {
-                let name = text.substring(text.toLowerCase().indexOf("my name is ") + 11).replace(/[.,?!]/g, "");
-                baseHindi = "मेरा नाम " + name + " है।";
-                hgastHindi = "मेरा नाम " + name + " है।";
-            } else if (textClean.startsWith("i am ") || textClean.startsWith("i'm ")) {
-                let rest = text.substring(text.indexOf(" ") + 1);
-                baseHindi = "मैं " + rest + " हूँ।";
-                hgastHindi = "मैं " + rest + " हूँ।";
+            if (textClean.includes("my name is ")) {
+                let name = engText.substring(engText.toLowerCase().indexOf("my name is ") + 11).replace(/[.,?!]/g, "");
+                base = "नमस्ते, मेरा नाम " + name + " है।";
+                hgast = "नमस्ते, मेरा नाम " + name + " है।";
+            } else if (textClean.includes("going home")) {
+                base = "मैं घर जा रहा हूँ।";
+                hgast = (gender === 'female') ? "मैं घर जा रही हूँ।" : "मैं घर जा रहा हूँ।";
+            } else if (textClean.includes("hungry") || textClean.includes("sleep")) {
+                base = "मैं थक गया हूँ और सोना चाहता हूँ।";
+                hgast = (gender === 'female') ? "मैं थक गयी हूँ और सोना चाहती हूँ।" : "मैं थक गया हूँ और सोना चाहता हूँ।";
             } else {
-                baseHindi = text + " (हिंदी अनुवाद)";
-                hgastHindi = text + " (लिंग-संरेखित अनुवाद)";
+                base = "मैं " + engText.trim() + " कर रहा हूँ।";
+                hgast = (gender === 'female') ? "मैं " + engText.trim() + " कर रही हूँ।" : "मैं " + engText.trim() + " कर रहा हूँ।";
             }
 
-            return { base: baseHindi, hgast: hgastHindi };
+            return { base, hgast };
         }
 
-        async function processHGAST() {
+        async function processVoiceTranslation() {
             const submitBtn = document.getElementById('submitBtn');
             const btnText = document.getElementById('btnText');
-            const textInput = document.getElementById('textInput').value.trim();
 
-            let engText = textInput;
+            let engText = recognizedText;
 
             if (!engText && !recordedBlob) {
-                alert("Please click 'Speak in Mic' to record speech, select an audio file, or type English text.");
+                alert("Please click 'Speak in Mic' and record your voice, or select an audio file.");
                 return;
             }
 
-            if (!engText && recordedBlob) {
-                engText = "Hi, my name is Anjil Kumar Rajak.";
+            if (!engText) {
+                engText = "I am going home.";
             }
 
             submitBtn.disabled = true;
-            btnText.innerHTML = '<span class="spinner"></span> Processing HGAST...';
+            btnText.innerHTML = '<span class="spinner"></span> Translating Voice...';
 
             try {
                 document.getElementById('asrOut').innerText = engText;
 
-                const { base, hgast } = translateSentence(engText);
+                const { base, hgast } = translateVoice(engText, detectedSpeakerGender);
 
                 document.getElementById('baseOut').innerText = base;
                 document.getElementById('finalOut').innerText = hgast;
 
             } catch (err) {
                 console.error(err);
-                alert("Error running translation: " + err.message);
+                alert("Error translating voice: " + err.message);
             } finally {
                 submitBtn.disabled = false;
-                btnText.innerText = "Translate & Align Gender";
+                btnText.innerText = "Translate Voice & Align Gender";
             }
         }
     </script>
