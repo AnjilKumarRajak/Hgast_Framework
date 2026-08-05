@@ -8,7 +8,7 @@ sdk_version: 4.44.0
 app_file: app.py
 pinned: false
 header: mini
-short_description: Hybrid Gender-Aware Speech Translation using HF Serverless Inference API
+short_description: Hybrid Gender-Aligned Speech Translation
 ---
 
 # 🎙️ HGAST++ Framework (Option 3: HF Inference API Hybrid Approach)
