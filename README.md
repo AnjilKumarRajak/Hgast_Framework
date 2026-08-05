@@ -9,11 +9,10 @@ pinned: false
 
 # 🎙️ HGAST Framework
 
-**HGAST** (Hybrid Gender-Aware Speech Translation Framework) combines speaker & subject linguistic analysis, dual-controller gender routing, and morphological refinement to produce grammatically accurate gender-aligned Hindi translations.
+**HGAST Framework** (Hierarchical Gender Arbitration for Speech Translation) combines acoustic speaker analysis, linguistic subject parsing, and gender arbitration to produce gender-faithful Hindi translations directly from speech and text.
 
-## 🚀 Static Space Architecture
+## 🚀 Key Features
 
-1. **🎤 Speech / Microphone Input**: Real-time browser audio recording & upload.
-2. **✨ Baseline Output (Uncorrected)**: Raw translation baseline.
-3. **✨ HGAST Output (Gender-Aligned)**: Morphologically corrected gender-aligned output.
-4. **🧠 Diagnostic Routing Trace**: Real-time linguistic controller analysis.
+1. **🎤 Direct Speech & Microphone Input**: Real-time microphone recording and audio file upload.
+2. **✨ Baseline Output (SeamlessM4T-v2-Large)**: Direct translation baseline.
+3. **✨ HGAST Output (Gender-Faithful)**: Acoustic and linguistic gender-aligned translation.
