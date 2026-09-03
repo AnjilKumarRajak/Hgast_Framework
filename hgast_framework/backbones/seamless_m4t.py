@@ -36,7 +36,7 @@ class SeamlessM4TBackbone(TranslationBackbone):
         inputs = self._processor(text=text, src_lang="eng", return_tensors="pt").to(DEVICE)
         with torch.inference_mode():
             out_tokens = self._model.generate(
-                **inputs, tgt_lang="hin", generate_speech=False
+                **inputs, tgt_lang="hin", generate_speech=False, num_beams=4
             )
         text_out = self._processor.decode(out_tokens[0].tolist(), skip_special_tokens=True)
         return text_out.strip()
@@ -48,6 +48,6 @@ class SeamlessM4TBackbone(TranslationBackbone):
         ).to(DEVICE)
         with torch.inference_mode():
             out_tokens = self._model.generate(
-                **inputs, tgt_lang="eng", generate_speech=False
+                **inputs, tgt_lang="eng", generate_speech=False, num_beams=4
             )
         return self._processor.decode(out_tokens[0].tolist(), skip_special_tokens=True)
