@@ -39,6 +39,11 @@ llm_refiner = LLMGenderRefiner(chat_fn=qwen_chat_fn if USE_LLM_REFINE else None)
 
 
 def build_test_set():
+    """
+    Minimal 4-sample smoke test for rapid local pipeline and metric verification.
+    Full paper evaluations are conducted on the benchmark datasets detailed in
+    Section 3.1 & Table 1 (Hindi: 4,865; Marathi: 1,195; Gujarati: 650 samples).
+    """
     return [
         {"en": "I am going home.", "hi_ref": "मैं घर जा रहा हूँ।",
          "target_gender": 0, "speaker_gender": 0, "speaker_conf": 0.9},
