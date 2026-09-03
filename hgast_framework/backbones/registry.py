@@ -7,6 +7,8 @@ from .indic_conformer import IndicConformerASR
 from .whisper_asr import WhisperASR
 from .cascaded import CascadedBackbone
 
+from .nllb import NLLBBackbone
+
 _REGISTRY = {
     # 1. IndicConformer + IndicTrans2 (Specialized cascaded pipeline)
     "indicconformer_indictrans2": lambda: CascadedBackbone(
@@ -25,11 +27,7 @@ _REGISTRY = {
     "whisper_nllb": lambda: CascadedBackbone(
         name="Whisper + NLLB-200",
         asr_module=WhisperASR(),
-        mt_backbone=GenericHFBackbone(
-            model_id="facebook/nllb-200-distilled-600M",
-            name="NLLB-200",
-            prompt_template="{text}",
-        ),
+        mt_backbone=NLLBBackbone(),
     ),
 
     # Text-only MT backbones
@@ -37,6 +35,7 @@ _REGISTRY = {
     "indictrans2_ft": lambda: IndicTrans2Backbone(
         model_id="checkpoints/indictrans2_ft"
     ),
+    "nllb": lambda: NLLBBackbone(),
 
     # Standalone ASR modules
     "indic_conformer": lambda: IndicConformerASR(),
