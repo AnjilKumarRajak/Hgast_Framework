@@ -1,4 +1,4 @@
-# HGAST: Hybrid Gender-Aware Speech and Text Translation
+# HGAST Framework: Hierarchical Gender Arbitration for Speech Translation
 
 A framework for gender-agreement correction in speech and text translation for Indo-Aryan languages (Hindi, Marathi, Gujarati). 
 
