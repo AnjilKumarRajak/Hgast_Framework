@@ -104,16 +104,21 @@ class HGASTFramework:
             morph_ok = morph_match(post, target_gender) if target_gender in (0, 1) else True
             trace["stages"].append({"stage": "hard_force_rules", "output": hi_corrected, "morph_ok": morph_ok})
 
-        # ---- Stage 4: LLM fluency/gender refine ----
+        # ---- Stage 4: Constrained Generative Refinement (AoR Operator, Eq. 7-8) ----
+        # Per Section 2.5: rewrites directly from hi_raw, bypassing Stage 3 to prevent error propagation.
         llm_applied = False
-        if self.use_llm_refine and self.llm_refiner.available and target_gender in (0, 1) and hi_corrected:
-            before = hi_corrected
-            hi_corrected = self.llm_refiner.refine(
-                en_text, hi_corrected, target_gender, subj_info["person"]
+        if self.use_llm_refine and self.llm_refiner.available and target_gender in (0, 1) and hi_raw:
+            t_llm = self.llm_refiner.refine(
+                en_text, hi_raw, target_gender, subj_info["person"]
             )
-            llm_applied = hi_corrected != before
+            if t_llm != hi_raw:
+                hi_corrected = t_llm
+                llm_applied = True
+            else:
+                # When refiner is enabled, AoR reverts to raw draft if gates fail
+                hi_corrected = hi_raw
             trace["stages"].append({
-                "stage": "llm_refine", "before": before, "after": hi_corrected, "changed": llm_applied,
+                "stage": "llm_refine", "t_raw": hi_raw, "t_final": hi_corrected, "accepted": llm_applied,
             })
 
         return HGASTResult(

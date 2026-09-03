@@ -51,6 +51,11 @@ def detect_gender_from_array(audio_array, sampling_rate: int) -> tuple:
         score = float(probs.max().item())
         label = _gender_model.config.id2label[pred_id].lower()
 
+        # Section 2.2: calibrate conservative confidence threshold tau_ac = 0.65
+        # Triggering abstention (-1) rather than forced assignment when acoustic evidence is weak
+        if score < 0.65:
+            return (-1, score, "wav2vec2_gender_abstain")
+
         if "female" in label:
             return (1, score, "wav2vec2_gender")
         if "male" in label:
