@@ -6,19 +6,31 @@ log = logging.getLogger(__name__)
 
 _gender_model = None
 _gender_feature_extractor = None
+_load_attempted = False
 _FAILED = object()
 
 
 def _load():
-    global _gender_model, _gender_feature_extractor
+    global _gender_model, _gender_feature_extractor, _load_attempted
+    if _load_attempted:
+        return
+    _load_attempted = True
     if _gender_model is not None:
         return
     try:
         import torch
         from transformers import AutoFeatureExtractor, AutoModelForAudioClassification
         model_id = "alefiury/wav2vec2-large-xlsr-53-gender-recognition-librispeech"
-        _gender_feature_extractor = AutoFeatureExtractor.from_pretrained(model_id)
-        _gender_model = AutoModelForAudioClassification.from_pretrained(model_id).to(DEVICE)
+        try:
+            _gender_feature_extractor = AutoFeatureExtractor.from_pretrained(
+                model_id, local_files_only=True
+            )
+            _gender_model = AutoModelForAudioClassification.from_pretrained(
+                model_id, local_files_only=True
+            ).to(DEVICE)
+        except Exception:
+            _gender_feature_extractor = AutoFeatureExtractor.from_pretrained(model_id)
+            _gender_model = AutoModelForAudioClassification.from_pretrained(model_id).to(DEVICE)
         _gender_model.eval()
         log.info("Speaker gender model loaded.")
     except Exception as exc:

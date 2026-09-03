@@ -8,6 +8,7 @@ from .gender.linguistic_analysis import parse_subject, resolve_coreference
 from .gender.dual_control import build_dual_control, resolve_target_gender, detect_politeness
 from .gender.morphology_rules import apply_morphology, count_morph_tokens, morph_match, _apply_rules
 from .gender.llm_refine import LLMGenderRefiner
+from .gender.speaker_gender import detect_gender_from_array
 
 log = logging.getLogger(__name__)
 
@@ -133,4 +134,32 @@ class HGASTFramework:
             morph_ok=morph_ok,
             llm_applied=llm_applied,
             trace=trace,
+        )
+
+    def translate_speech(
+        self,
+        audio_array,
+        sampling_rate: int = 16000,
+    ) -> HGASTResult:
+        """
+        Algorithm 1: End-to-end speech translation with gender arbitration.
+        Processes raw audio a:
+          1. Extracts acoustic speaker gender (g_ac, conf_ac) via wav2vec2.
+          2. Extracts transcript t via upstream ASR (native for cascaded, auxiliary for E2E).
+          3. Arbitrates target gender, applies morphology correction, and generative refinement.
+        """
+        spk_g, spk_conf, _ = detect_gender_from_array(audio_array, sampling_rate)
+
+        if hasattr(self.backbone, "transcribe"):
+            transcript = self.backbone.transcribe(audio_array, sampling_rate=sampling_rate)
+        else:
+            raise NotImplementedError(
+                f"{self.backbone.name} does not implement transcribe(). "
+                "For cascaded speech translation, wrap with CascadedBackbone(asr_module, mt_backbone)."
+            )
+
+        return self.translate(
+            en_text=transcript,
+            speaker_gender=spk_g,
+            speaker_confidence=spk_conf,
         )
