@@ -4,6 +4,14 @@ A framework for gender-agreement correction in speech and text translation for I
 
 The framework operates on top of any translation backbone (e.g., IndicTrans2, SeamlessM4T) without requiring retraining. It orchestrates linguistic analysis, person-conditioned dual-control routing, rule-based morphological inflection, and LLM-based fluency refinement with safety verification gates.
 
+## Compared Backbones
+
+As evaluated in the paper, HGAST supports both cascaded and end-to-end speech translation architectures:
+
+1. **IndicConformer + IndicTrans2**: A specialized cascaded pipeline combining `ai4bharat/indicconformer_stt_en_hybrid_ctc_rnnt_large` (ASR) and `ai4bharat/indictrans2-en-indic-1B` (MT).
+2. **SeamlessM4T-v2-Large**: A direct end-to-end multilingual speech-to-text model (`facebook/seamless-m4t-v2-large`).
+3. **Whisper + NLLB-200**: A general-purpose cascaded pipeline combining `openai/whisper-large-v3` (ASR) and `facebook/nllb-200-distilled-600M` (MT).
+
 ## Architecture
 
 1. **Linguistic Analysis**: Extracts subject identity, coreference chains, grammatical person (1st, 2nd, 3rd), and entity gender cues.
