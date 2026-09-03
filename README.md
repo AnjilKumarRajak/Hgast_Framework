@@ -30,10 +30,14 @@ As evaluated in the paper, HGAST supports both cascaded and end-to-end speech tr
 │   ├── config.py                     # Configuration constants and thresholds
 │   ├── pipeline.py                   # Main orchestrator (HGASTFramework)
 │   ├── run_experiment.py             # End-to-end execution and evaluation script
-│   ├── backbones/                    # Translation backbone adapters
+│   ├── backbones/                    # Speech & translation backbone adapters
 │   │   ├── base.py                   # TranslationBackbone interface
+│   │   ├── indic_conformer.py        # AI4Bharat IndicConformer ASR adapter
+│   │   ├── whisper_asr.py            # OpenAI Whisper ASR adapter
+│   │   ├── cascaded.py               # Cascaded ASR + MT pipeline wrapper
 │   │   ├── indictrans2.py            # AI4Bharat IndicTrans2 adapter
 │   │   ├── seamless_m4t.py           # Meta SeamlessM4T (v2) adapter
+│   │   ├── nllb.py                   # Meta NLLB-200 adapter
 │   │   ├── generic_hf.py             # Generic HuggingFace seq2seq/causal adapter
 │   │   └── registry.py               # Model registry
 │   ├── gender/                       # Gender analysis and correction modules

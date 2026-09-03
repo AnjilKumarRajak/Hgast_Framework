@@ -38,12 +38,20 @@ class NLLBBackbone(TranslationBackbone):
         try:
             from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
             log.info(f"[{self.name}] loading {self.model_id} ...")
-            self._tokenizer = AutoTokenizer.from_pretrained(
-                self.model_id, src_lang="eng_Latn"
-            )
-            self._model = AutoModelForSeq2SeqLM.from_pretrained(
-                self.model_id
-            ).to(DEVICE)
+            try:
+                self._tokenizer = AutoTokenizer.from_pretrained(
+                    self.model_id, src_lang="eng_Latn", local_files_only=True
+                )
+                self._model = AutoModelForSeq2SeqLM.from_pretrained(
+                    self.model_id, local_files_only=True
+                ).to(DEVICE)
+            except Exception:
+                self._tokenizer = AutoTokenizer.from_pretrained(
+                    self.model_id, src_lang="eng_Latn"
+                )
+                self._model = AutoModelForSeq2SeqLM.from_pretrained(
+                    self.model_id
+                ).to(DEVICE)
             self._model.eval()
             log.info(f"[{self.name}] loaded on {DEVICE}.")
         except Exception as exc:

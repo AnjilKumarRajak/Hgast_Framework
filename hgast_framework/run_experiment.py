@@ -30,7 +30,7 @@ from hgast_framework.evaluation.ablation import run_ablation, format_ablation_ta
 
 
 # 1. Select backbone
-# Options: "indicconformer_indictrans2", "seamless_m4t", "whisper_nllb", "indictrans2"
+# Options: "indicconformer_indictrans2", "seamless_m4t", "whisper_nllb", "indictrans2", "nllb"
 BACKBONE_KEY = "indicconformer_indictrans2"
 
 # 2. Select LLM refiner
