@@ -65,23 +65,33 @@ def build_dual_control(speaker_gender: int, speaker_confidence: float,
 
 
 def resolve_target_gender(dual: dict, subj_confidence_threshold: float = 0.55) -> tuple:
-    """Returns (target_gender: int in {0,1,-1}, reason: str)."""
+    """
+    Arbitration function A(p, g_ac, g_subj, c) resolving (g_target, kappa):
+      - p = 1: (g_ac, "speaker")
+      - p = 2: (g_ac, "self-address")
+      - p = 3, g_subj != empty, c >= tau: (g_subj, "subject")
+      - p = 3, (g_subj == empty or c < tau): (g_ac, "fallback")
+    where tau = subj_confidence_threshold (default 0.55).
+    """
     dominant = dual["dominant_controller"]
     speaker_gender = dual["speaker_ctrl"]["gender"]
     subj_gender = dual["subject_ctrl"]["gender"]
     subj_conf = dual["subject_ctrl"].get("confidence", 0.0)
 
+    # p = 1: (g_ac, speaker)
     if dominant == "speaker":
-        return (speaker_gender, "speaker_primary") if speaker_gender != -1 else (-1, "unknown")
+        return (speaker_gender, "speaker") if speaker_gender != -1 else (-1, "unknown")
 
+    # p = 2: (g_ac, self-address)
     if dominant == "politeness":
-        return (speaker_gender, "speaker_fallback_politeness") if speaker_gender != -1 else (-1, "unknown")
+        return (speaker_gender, "self-address") if speaker_gender != -1 else (-1, "unknown")
 
+    # p = 3: subject dominant if confident, else fallback to acoustic speaker
     if dominant == "subject":
         if subj_gender != -1 and subj_conf >= subj_confidence_threshold:
-            return subj_gender, "subject_dominant"
+            return subj_gender, "subject"
         if speaker_gender != -1:
-            return speaker_gender, "speaker_fallback_subject_uncertain"
-        return -1, "unknown_subject_no_forcing"
+            return speaker_gender, "fallback"
+        return -1, "fallback"
 
     return -1, "unknown"
