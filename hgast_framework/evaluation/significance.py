@@ -36,12 +36,13 @@ def bootstrap_compare(hyps_a: List[str], hyps_b: List[str], refs: List[str],
         r_sample = [refs[i] for i in idxs]
         score_a = metric_fn(a_sample, r_sample)
         score_b = metric_fn(b_sample, r_sample)
-        diffs.append(score_b - score_a)
-        if score_b > score_a:
-            wins_b += 1
+        if score_a is not None and score_b is not None:
+            diffs.append(score_b - score_a)
+            if score_b > score_a:
+                wins_b += 1
 
-    p_value = 1 - (wins_b / n_samples)  # prob B is NOT better than A
-    mean_diff = sum(diffs) / len(diffs)
+    p_value = 1 - (wins_b / n_samples) if n_samples > 0 else 1.0
+    mean_diff = (sum(diffs) / len(diffs)) if diffs else 0.0
     return {
         "mean_diff": mean_diff,
         "p_value_approx": p_value,

@@ -16,7 +16,7 @@ ABLATION_STAGES = [
     ("speaker_gender_only", dict(use_coreference=False, use_rule_morphology=False, use_llm_refine=False)),
     ("subject_coreference", dict(use_coreference=True, use_rule_morphology=False, use_llm_refine=False)),
     ("rule_based_morphology", dict(use_coreference=True, use_rule_morphology=True, use_llm_refine=False)),
-    ("full_hgast_plus_plus", dict(use_coreference=True, use_rule_morphology=True, use_llm_refine=True)),
+    ("full_framework", dict(use_coreference=True, use_rule_morphology=True, use_llm_refine=True)),
 ]
 
 
