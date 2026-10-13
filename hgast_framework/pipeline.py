@@ -18,7 +18,7 @@ class HGASTResult:
     english: str
     hindi_raw: str          # backbone output, before any correction
     hindi: str               # final corrected output
-    target_gender: int       # -1/0/1
+    target_gender: int      
     target_gender_reason: str
     person: str
     subject_gender: str
