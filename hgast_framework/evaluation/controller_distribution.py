@@ -1,22 +1,3 @@
-"""
-Arbitration-routing diagnostics.
-
-Two reporting utilities:
-
-  1. compute_controller_distribution / format_controller_distribution_table
-     -- reports what fraction of corrections relied on acoustic routing versus
-     subject parsing. Aggregates the per-instance
-     kappa controller label (HGASTResult.target_gender_reason: "speaker",
-     "self-address", "subject", "fallback", "unknown"/"abstain") returned by
-     dual_control.resolve_target_gender, so the actual routing behavior -- not just
-     the raw acoustic-classifier subgroup accuracy in isolation -- is visible.
-
-  2. compute_coverage_and_effective_accuracy / CoverageAccuracyResult
-     -- quantifies the coverage-for-safety trade-off between the
-     default fallback-to-speaker-gender behavior and the abstain_on_ambiguous_subject
-     variant (see gender/dual_control.py), matching the paper's Appendix B.15
-     definition: Effective Accuracy = Coverage x Macro Accuracy.
-"""
 
 import logging
 from dataclasses import dataclass
@@ -38,11 +19,6 @@ class ControllerDistribution:
 
 
 def compute_controller_distribution(reasons: List[str]) -> ControllerDistribution:
-    """
-    reasons: per-instance `target_gender_reason` values from HGASTResult, i.e. the
-    kappa label assigned by dual_control.resolve_target_gender for each translated
-    instance.
-    """
     n = len(reasons)
     counts = dict(Counter(reasons))
     percentages = {k: (round(100.0 * v / n, 2) if n else 0.0) for k, v in counts.items()}
@@ -77,16 +53,7 @@ def compute_coverage_and_effective_accuracy(
     arbitrated_target_genders: List[int],
     ground_truth_genders: List[int],
 ) -> CoverageAccuracyResult:
-    """
-    arbitrated_target_genders: per-instance HGASTResult.target_gender (-1 = abstain/
-        unresolved by arbitration; this is the framework's own routing decision, NOT
-        the ground-truth label).
-    ground_truth_genders: the true/reference speaker or subject gender (0=male,
-        1=female) used to score correctness.
 
-    Effective Accuracy = Coverage x Macro Accuracy (paper Appendix B.15), so that a
-    variant cannot inflate its headline accuracy simply by abstaining on hard cases.
-    """
     n_total = len(hindi_outputs)
     resolved_idx = [i for i, g in enumerate(arbitrated_target_genders) if g in (0, 1)]
     n_resolved = len(resolved_idx)
