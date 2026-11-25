@@ -1,36 +1,4 @@
-"""
-Two analyses computed directly on already-logged evaluation data, for all
-three languages (Hindi, Marathi, Gujarati) -- no backbone/ASR/GPU rerun required:
 
-1. Tier-1-only vs. full-system translation quality (BLEU/chrF++),
-   using the already-logged pred_tier1 / pred_tier2 fields, isolating Stage 4's
-   (the LLM refiner's) specific contribution to translation quality rather than
-   just gender accuracy (Table 7 in the paper covers only the latter).
-
-   NOTE (known caveat, not yet resolved): this script skips instances where
-   pred_tier1/pred_tier2 are empty (e.g. Hindi: 4,315/4,865 have both fields
-   populated). The resulting corpus-level deltas do not necessarily match the
-   paper's Table 12 (which scores the full corpus, baseline vs. full HGAST) --
-   do not treat this script's Baseline/Full numbers as a direct substitute for
-   Table 12 without first checking why the excluded instances have empty tier
-   fields and whether including them changes the sign of the delta.
-
-2. Audit of how many sentences contain multiple coordinated
-   clauses with different grammatical persons/subjects (i.e., would need more
-   than one target gender -- the multi-clause limitation discussed in the paper), using the
-   real subject parser (fast-path lexicon rules only, no coreference chaining --
-   consistent with how most already-logged Hindi records were processed, per
-   their empty coref_map fields). The clause splitter is a naive coordinating-
-   conjunction split ("and"/"but"/";"), so results are an UPPER BOUND / heuristic
-   estimate, not an exact count -- inspect the printed examples before citing an
-   exact percentage.
-
-Usage:
-    python -m hgast_framework.analyze_quality_and_multireferent --data-dir path/to/dataset
-
-Expects, in --data-dir: predictions.json (Hindi), hgast_marathi_predictions.json,
-hgast_gujarati_predictions.json, with the field names in LANGS below.
-"""
 import argparse
 import json
 import os
