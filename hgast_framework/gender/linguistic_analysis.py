@@ -17,11 +17,7 @@ def get_spacy():
     global _nlp_spacy
     if _nlp_spacy is None:
         import spacy
-        try:
-            _nlp_spacy = spacy.load("en_core_web_trf")
-        except OSError:
-            log.warning("en_core_web_trf not found, falling back to en_core_web_sm")
-            _nlp_spacy = spacy.load("en_core_web_sm")
+        _nlp_spacy = spacy.load("en_core_web_sm")
     return _nlp_spacy
 
 

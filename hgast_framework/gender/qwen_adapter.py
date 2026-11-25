@@ -51,7 +51,7 @@ def qwen_chat_fn(prompt: str) -> str:
 
         with torch.no_grad():
             generated_ids = model.generate(
-                **model_inputs, max_new_tokens=512, temperature=0.01, do_sample=False
+                **model_inputs, max_new_tokens=512, do_sample=True, temperature=0.01, top_p=0.9
             )
         generated_ids = [
             out_ids[len(in_ids):] for in_ids, out_ids in zip(model_inputs.input_ids, generated_ids)

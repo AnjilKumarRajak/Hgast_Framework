@@ -168,16 +168,13 @@ class LLMGenderRefiner:
         new_words = result_clean - draft_clean
         dropped_words = draft_clean - result_clean
 
-        VOWEL_ENDINGS = ("ा", "ी", "े", "ें", "ों", "ू")
+        # Stem gate: a changed word must share at least its first two characters with a
+        # word it replaced in the draft; any other new word counts as hallucinated content.
         truly_new = set()
         for nw in new_words:
             if nw in allowed_new:
                 continue
-            nw_stem = nw[:-1] if nw.endswith(VOWEL_ENDINGS) else nw
-            is_inflection = any(
-                (dw[:-1] if dw.endswith(VOWEL_ENDINGS) else dw) == nw_stem
-                for dw in dropped_words
-            )
+            is_inflection = len(nw) >= 2 and any(dw[:2] == nw[:2] for dw in dropped_words)
             if not is_inflection:
                 truly_new.add(nw)
 

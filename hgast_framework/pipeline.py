@@ -18,7 +18,7 @@ class HGASTResult:
     english: str
     hindi_raw: str          # backbone output, before any correction
     hindi: str               # final corrected output
-    target_gender: int      
+    target_gender: int       # -1/0/1
     target_gender_reason: str
     person: str
     subject_gender: str
@@ -38,6 +38,7 @@ class HGASTFramework:
         use_llm_refine: bool = True,
         subj_confidence_threshold: float = 0.55,
         max_translate_attempts: int = 3,
+        abstain_on_ambiguous_subject=False,  # False | True (blanket) | "targeted"
     ):
         self.backbone = backbone
         self.llm_refiner = llm_refiner or LLMGenderRefiner(chat_fn=None)
@@ -46,6 +47,14 @@ class HGASTFramework:
         self.use_llm_refine = use_llm_refine
         self.subj_confidence_threshold = subj_confidence_threshold
         self.max_translate_attempts = max_translate_attempts
+        # Controls what happens when a third-person subject's
+        # gender is unresolved/low-confidence. False (default) = fall back to speaker
+        # gender; True = abstain on every such case (blanket, costly -- see
+        # dual_control.py docstring); "targeted" = abstain only when the unresolved
+        # subject matches a known gendered-kinship/pronoun term (recommended).
+        # See gender/dual_control.py:resolve_target_gender for the full rationale and
+        # the measured Coverage/Effective-Accuracy trade-off.
+        self.abstain_on_ambiguous_subject = abstain_on_ambiguous_subject
 
     def translate(
         self,
@@ -65,7 +74,10 @@ class HGASTFramework:
 
         # ---- Stage 2: dual control routing ----
         dual = build_dual_control(speaker_gender, speaker_confidence, subj_info, politeness)
-        target_gender, reason = resolve_target_gender(dual, self.subj_confidence_threshold)
+        target_gender, reason = resolve_target_gender(
+            dual, self.subj_confidence_threshold,
+            abstain_on_ambiguous_subject=self.abstain_on_ambiguous_subject,
+        )
         trace["dual_control"] = dual
         trace["target_gender"] = target_gender
         trace["target_gender_reason"] = reason
@@ -105,10 +117,17 @@ class HGASTFramework:
             morph_ok = morph_match(post, target_gender) if target_gender in (0, 1) else True
             trace["stages"].append({"stage": "hard_force_rules", "output": hi_corrected, "morph_ok": morph_ok})
 
-        # ---- Stage 4: Constrained Generative Refinement (AoR Operator, Eq. 7-8) ----
-        # Per Section 2.5: rewrites directly from hi_raw, bypassing Stage 3 to prevent error propagation.
+        # ---- Stage 4: Constrained Generative Refinement (AoR operator) ----
+        # Tier-1 fast path: the LLM is invoked only when the Stage-3 agreement check fails
+        # (m(T') = 0); otherwise the Stage-3 output is final. Stage 4 rewrites directly from
+        # hi_raw, bypassing Stage 3 to prevent error propagation, and AoR reverts to the raw
+        # draft if the rewrite fails the validation gates.
         llm_applied = False
-        if self.use_llm_refine and self.llm_refiner.available and target_gender in (0, 1) and hi_raw:
+        llm_eligible = (self.use_llm_refine and self.llm_refiner.available
+                        and target_gender in (0, 1) and bool(hi_raw))
+        if llm_eligible and morph_ok:
+            trace["stages"].append({"stage": "tier1_fast_path", "output": hi_corrected})
+        elif llm_eligible:
             t_llm = self.llm_refiner.refine(
                 en_text, hi_raw, target_gender, subj_info["person"]
             )
@@ -116,8 +135,8 @@ class HGASTFramework:
                 hi_corrected = t_llm
                 llm_applied = True
             else:
-                # When refiner is enabled, AoR reverts to raw draft if gates fail
                 hi_corrected = hi_raw
+            morph_ok = morph_match(count_morph_tokens(hi_corrected), target_gender)
             trace["stages"].append({
                 "stage": "llm_refine", "t_raw": hi_raw, "t_final": hi_corrected, "accepted": llm_applied,
             })

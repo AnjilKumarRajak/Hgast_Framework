@@ -26,7 +26,10 @@ from hgast_framework.evaluation.metrics import compute_bleu, compute_chrf, compu
 from hgast_framework.evaluation.gender_metrics import compute_gender_accuracy
 from hgast_framework.evaluation.significance import bootstrap_compare, mcnemar_test
 from hgast_framework.evaluation.error_analysis import classify_failure, summarize_errors
-from hgast_framework.evaluation.ablation import run_ablation, format_ablation_table
+from hgast_framework.evaluation.ablation import (
+    run_ablation, format_ablation_table, tier1_vs_full_quality_delta,
+    run_arbitration_variant_comparison, format_arbitration_variant_table,
+)
 
 
 # 1. Select backbone
@@ -103,7 +106,9 @@ def main():
     print(f"\n=== Error analysis ===")
     print(summarize_errors(failures))
 
-    # ---- Ablation study ----
+    # ---- Ablation study (now includes chrF++ per stage; pass compute_comet_score=True
+    #      for a full paper-scale run to also populate COMET -- omitted by default here
+    #      since it downloads a large model) ----
     print(f"\n=== Ablation study ===")
     ablation_rows = run_ablation(
         backbone=backbone,
@@ -113,8 +118,28 @@ def main():
         target_genders=target_genders,
         speaker_genders=[ex["speaker_gender"] for ex in test_set],
         speaker_confidences=[ex["speaker_conf"] for ex in test_set],
+        compute_comet_score=False,
     )
     print(format_ablation_table(ablation_rows))
+
+    # ---- Stage-4 (LLM refiner) contribution to translation QUALITY
+    #      specifically, isolated from its contribution to gender accuracy (Table 7
+    #      in the paper already reports the latter) ----
+    print(f"\n=== Tier-1-only vs. full-system quality delta ===")
+    print(tier1_vs_full_quality_delta(ablation_rows))
+
+    # ---- Fallback-to-speaker-gender vs. abstain-on-ambiguous-subject,
+    #      for third-person referents where parsing confidence is insufficient ----
+    print(f"\n=== Arbitration variant comparison: fallback vs. abstain ===")
+    variant_rows = run_arbitration_variant_comparison(
+        backbone=backbone,
+        llm_refiner=llm_refiner,
+        en_texts=[ex["en"] for ex in test_set],
+        ground_truth_genders=target_genders,
+        speaker_genders=[ex["speaker_gender"] for ex in test_set],
+        speaker_confidences=[ex["speaker_conf"] for ex in test_set],
+    )
+    print(format_arbitration_variant_table(variant_rows))
 
 
 if __name__ == "__main__":
