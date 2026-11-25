@@ -1,22 +1,3 @@
-"""Recompute the result-table numbers for one language-backbone configuration.
-
-Every number comes from the same prediction file, so the tables stay mutually consistent:
-gender accuracy and coverage (Table 6), McNemar counts (Table 19), point metrics
-(Table 12), bootstrap mean +- SD (Table 13), female-subset point +- 95% CI half-width
-(Table 10), amplification (Table 9), and the share of outputs without a gendered form.
-Metrics: BLEU, chrF++, TER, WER; with --extra also BERTScore and COMET (all bootstrapped).
-
-Input: a JSON list (or JSON Lines) of per-sentence records with
-  target_gender  0 = male, 1 = female; any other value = excluded (abstained / neuter)
-  baseline       backbone-only output
-  hgast          HGAST output
-  reference      reference translation
-  source         English source (only needed for --extra, for COMET)
-Map differently named keys with --field, e.g. --field hgast=framework_output.
-
-Example:
-  python -m hgast_framework.evaluate_predictions preds.json --lang hi --name "Hindi / Whisper" --out hi_whisper.json
-"""
 
 import argparse
 import json
