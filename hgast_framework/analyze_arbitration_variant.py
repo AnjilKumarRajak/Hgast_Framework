@@ -1,23 +1,4 @@
-"""
-Analysis: fallback-to-speaker-gender vs. abstain-on-ambiguous-subject.
 
-Reprocesses an existing evaluation log (a JSON list of per-instance records, each
-carrying at minimum: target_gender, framework_output, baseline_output, morph_reason,
-subject, speaker_gender) to compare the current default arbitration behavior against
-the abstain-on-ambiguous-subject variant described in gender/dual_control.py, WITHOUT
-re-running the translation backbone, ASR, or parser -- this only touches the already-
-logged arbitration decisions and re-scores morphological correctness, so it needs no
-GPU and runs in seconds even on the full evaluation set.
-
-Usage:
-    python -m hgast_framework.analyze_arbitration_variant --data path/to/predictions.json
-
-Expected per-record schema (matches this repo's run_experiment.py / pipeline.py
-output when logging is enabled): target_gender (int, -1/0/1), speaker_gender (int),
-framework_output (str), baseline_output (str), morph_reason (str, one of
-"speaker_primary" | "speaker_fallback_politeness" | "subject_dominant" |
-"speaker_fallback_subject_uncertain"), subject (str, possibly empty).
-"""
 
 import argparse
 import json
