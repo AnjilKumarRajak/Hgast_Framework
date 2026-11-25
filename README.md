@@ -91,7 +91,7 @@ framework = HGASTFramework(backbone=backbone, llm_refiner=refiner)
 
 result = framework.translate(
     en_text="I am going home.",
-    speaker_gender=1,  # 0=male, 1=female, -1=unknown
+    speaker_gender=1,  
     speaker_confidence=0.92,
 )
 
